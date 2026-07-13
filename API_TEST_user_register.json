@@ -1,0 +1,373 @@
+{
+  "info": {
+    "_postman_id": "2f6e7f15-9be6-4be9-bdff-4e0d75df6454",
+    "name": "DEPI - Automation",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "44261737",
+    "_collection_link": "https://go.postman.co/collection/44261737-2f6e7f15-9be6-4be9-bdff-4e0d75df6454?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "login",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const responseData = pm.response.json();\r",
+              "\r",
+              "const token = responseData.access;\r",
+              "\r",
+              "pm.collectionVariables.set(\"bearerToken\", token);\r",
+              "\r",
+              "console.log(\"Token has been saved successfully!\");"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "username",
+              "value": "mralimagdy_admin",
+              "type": "text"
+            },
+            {
+              "key": "password",
+              "value": "59wnqgF2e3Mo",
+              "type": "text"
+            }
+          ]
+        },
+        "url": {
+          "raw": "https://mr-ali-magdy.zakerai.org/api/users/token/login/",
+          "protocol": "https",
+          "host": [
+            "mr-ali-magdy",
+            "zakerai",
+            "org"
+          ],
+          "path": [
+            "api",
+            "users",
+            "token",
+            "login",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "invitations list",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{bearerToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": []
+        },
+        "url": {
+          "raw": "https://mr-ali-magdy.zakerai.org/api/users/invite-code/",
+          "protocol": "https",
+          "host": [
+            "mr-ali-magdy",
+            "zakerai",
+            "org"
+          ],
+          "path": [
+            "api",
+            "users",
+            "invite-code",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "create invitation code",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{bearerToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "role",
+              "value": "admin",
+              "type": "text"
+            },
+            {
+              "key": "level_id",
+              "value": "3",
+              "type": "text"
+            }
+          ]
+        },
+        "url": {
+          "raw": "https://mr-ali-magdy.zakerai.org/api/users/invite-code/",
+          "protocol": "https",
+          "host": [
+            "mr-ali-magdy",
+            "zakerai",
+            "org"
+          ],
+          "path": [
+            "api",
+            "users",
+            "invite-code",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "invitations list repeated",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const responseData = pm.response.json();\r",
+              "\r",
+              "const unusedItem = responseData.find(item => item.is_accepted === false);\r",
+              "\r",
+              "if (unusedItem) {\r",
+              "    const code = unusedItem.code;\r",
+              "    \r",
+              "    pm.environment.set(\"fetchedCode\", code);\r",
+              "    \r",
+              "    console.log(\"Successfully saved unused code: \" + code);\r",
+              "} else {\r",
+              "    console.log(\"No unused codes found in the response.\");\r",
+              "}"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{bearerToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": []
+        },
+        "url": {
+          "raw": "https://mr-ali-magdy.zakerai.org/api/users/invite-code/",
+          "protocol": "https",
+          "host": [
+            "mr-ali-magdy",
+            "zakerai",
+            "org"
+          ],
+          "path": [
+            "api",
+            "users",
+            "invite-code",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "register as teacher",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const responseData = pm.response.json();\r",
+              "\r",
+              "const accessToken = responseData.tokens.access;\r",
+              "\r",
+              "if (accessToken) {\r",
+              "    pm.environment.set(\"bearerToken2\", accessToken);\r",
+              "    console.log(\"Access token saved successfully!\");\r",
+              "} else {\r",
+              "    console.log(\"Could not find the access token in the response.\");\r",
+              "}"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "username",
+              "value": "elbasha66",
+              "type": "text",
+              "uuid": "be661cec-bba2-4508-b3bc-dcf4cd72c67f"
+            },
+            {
+              "key": "password",
+              "value": "1234",
+              "type": "text",
+              "uuid": "831aa1b3-58a3-43d3-85ed-6c4696139d76"
+            },
+            {
+              "key": "code",
+              "value": "{{fetchedCode}}",
+              "type": "text",
+              "uuid": "dc80b14c-4406-4374-84d6-48a7fbf014a3"
+            },
+            {
+              "key": "phone",
+              "value": "01552828470",
+              "type": "text",
+              "uuid": "422a1c1d-60d2-43ac-a6e7-c4a339d9d738"
+            }
+          ]
+        },
+        "url": {
+          "raw": "https://mr-ali-magdy.zakerai.org/api/users/customers/",
+          "protocol": "https",
+          "host": [
+            "mr-ali-magdy",
+            "zakerai",
+            "org"
+          ],
+          "path": [
+            "api",
+            "users",
+            "customers",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "new created profile",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{bearerToken2}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": []
+        },
+        "url": {
+          "raw": "https://mr-ali-magdy.zakerai.org/api/analytics/profile/",
+          "protocol": "https",
+          "host": [
+            "mr-ali-magdy",
+            "zakerai",
+            "org"
+          ],
+          "path": [
+            "api",
+            "analytics",
+            "profile",
+            ""
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "bearerToken",
+      "value": ""
+    },
+    {
+      "key": "fetchedCode",
+      "value": ""
+    }
+  ]
+}

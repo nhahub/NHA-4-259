@@ -1,0 +1,263 @@
+{
+  "info": {
+    "_postman_id": "149faad3-e2a1-4bbd-b4d4-fa60a4aee68b",
+    "name": "DEPI project exam",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "44261737",
+    "_collection_link": "https://go.postman.co/collection/44261737-149faad3-e2a1-4bbd-b4d4-fa60a4aee68b?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "login",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const responseData = pm.response.json();\r",
+              "\r",
+              "const token = responseData.access;\r",
+              "\r",
+              "pm.collectionVariables.set(\"bearerToken\", token);\r",
+              "\r",
+              "console.log(\"Token has been saved successfully!\");"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "username",
+              "value": "mralimagdy_admin",
+              "type": "text"
+            },
+            {
+              "key": "password",
+              "value": "59wnqgF2e3Mo",
+              "type": "text"
+            }
+          ]
+        },
+        "url": {
+          "raw": "https://mr-ali-magdy.zakerai.org/api/users/token/login/",
+          "protocol": "https",
+          "host": [
+            "mr-ali-magdy",
+            "zakerai",
+            "org"
+          ],
+          "path": [
+            "api",
+            "users",
+            "token",
+            "login",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "questionsss",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// 1. Parse the response JSON\r",
+              "const responseData = pm.response.json();\r",
+              "\r",
+              "if (responseData && responseData.results) {\r",
+              "    const allowedTypes = ['mcq', 'essay', 'passage'];\r",
+              "    \r",
+              "    // 2. Filter for valid question types\r",
+              "    const validQuestions = responseData.results.filter(q => \r",
+              "        allowedTypes.includes(q.type_ans) && q.level && q.subject_semester\r",
+              "    );\r",
+              "    \r",
+              "    // 3. Group questions by their level and semester combination\r",
+              "    const groups = {};\r",
+              "    validQuestions.forEach(q => {\r",
+              "        // Create a unique key combining stage, grade, and semester\r",
+              "        const key = `${q.level.stage}_${q.level.grade}_${q.subject_semester}`;\r",
+              "        if (!groups[key]) {\r",
+              "            groups[key] = [];\r",
+              "        }\r",
+              "        groups[key].push(q);\r",
+              "    });\r",
+              "    \r",
+              "    // 4. Find the group that has the highest number of matching questions\r",
+              "    let bestGroupKey = null;\r",
+              "    let maxCount = 0;\r",
+              "    \r",
+              "    for (const key in groups) {\r",
+              "        if (groups[key].length > maxCount) {\r",
+              "            maxCount = groups[key].length;\r",
+              "            bestGroupKey = key;\r",
+              "        }\r",
+              "    }\r",
+              "    \r",
+              "    if (bestGroupKey) {\r",
+              "        const uniformQuestions = groups[bestGroupKey];\r",
+              "        const sampleQuestion = uniformQuestions[0];\r",
+              "        \r",
+              "        // 5. Save the matched level ID to an environment variable\r",
+              "        const levelId = sampleQuestion.level.id;\r",
+              "        pm.environment.set(\"examLevelId\", levelId);\r",
+              "        \r",
+              "        // 6. Select a subset of these uniform questions (e.g., up to 3)\r",
+              "        const subsetQuestions = uniformQuestions.slice(0, 3);\r",
+              "        \r",
+              "        // 7. Format the payload for the Exam API\r",
+              "        const formattedQuestions = subsetQuestions.map((q, index) => {\r",
+              "            return {\r",
+              "                \"question\": q.id,\r",
+              "                \"points\": q.points,\r",
+              "                \"display_order\": index + 1,\r",
+              "                \"time_limit_minutes\": q.estimated_time_minutes || 5\r",
+              "            };\r",
+              "        });\r",
+              "        \r",
+              "        // 8. Save the formatted questions array to an environment variable\r",
+              "        pm.environment.set(\"examQuestions\", JSON.stringify(formattedQuestions));\r",
+              "        \r",
+              "        console.log(`Selected Group: ${bestGroupKey}`);\r",
+              "        console.log(`Saved level ID [${levelId}] to {{examLevelId}}`);\r",
+              "        console.log(`Saved ${formattedQuestions.length} uniform questions to {{examQuestions}}`);\r",
+              "    } else {\r",
+              "        console.warn(\"No matching question groups could be determined.\");\r",
+              "    }\r",
+              "} else {\r",
+              "    console.error(\"No results found in the response payload.\");\r",
+              "}"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{bearerToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://mr-ali-magdy.zakerai.org/api/subjects/questions/?page=1",
+          "protocol": "https",
+          "host": [
+            "mr-ali-magdy",
+            "zakerai",
+            "org"
+          ],
+          "path": [
+            "api",
+            "subjects",
+            "questions",
+            ""
+          ],
+          "query": [
+            {
+              "key": "type_ans",
+              "value": "",
+              "type": "text",
+              "disabled": true
+            },
+            {
+              "key": "difficulty",
+              "value": "",
+              "type": "text",
+              "disabled": true
+            },
+            {
+              "key": "lesson_number",
+              "value": "",
+              "type": "text",
+              "disabled": true
+            },
+            {
+              "key": "subj",
+              "value": "",
+              "type": "text",
+              "disabled": true
+            },
+            {
+              "key": "chapter_id",
+              "value": "",
+              "type": "text",
+              "disabled": true
+            },
+            {
+              "key": "page",
+              "value": "1"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "create-exam",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{bearerToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"title\": \"Midterm Exam\",\r\n    \"instructions\": \"Complete all questions\",\r\n    \"duration_minutes\": 60,\r\n    \"level\": {{examLevelId}},\r\n    \"prevent_cheating\": true,\r\n    \"allowed_attempts\": 2,\r\n    \"questions\": {{examQuestions}}\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://mr-ali-magdy.zakerai.org/api/exams/",
+          "protocol": "https",
+          "host": [
+            "mr-ali-magdy",
+            "zakerai",
+            "org"
+          ],
+          "path": [
+            "api",
+            "exams",
+            ""
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "bearerToken",
+      "value": ""
+    }
+  ]
+}
